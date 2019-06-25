@@ -5,15 +5,30 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import slick.basic.DatabasePublisher
 import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.meta.MTable
 
 // The main application
 object HelloSlick extends App {
 
-  val users = TableQuery[Users]
-  val tips = TableQuery[Tips]
-
   val db = Database.forConfig("sqlite")
+
   try {
+    /*def createTableIfNotExists(tables: TableQuery[_ <: Table[_]]*): Future[Seq[Unit]] = {
+      Future.sequence(
+        tables map { table =>
+          db.run(MTable.getTables(table.baseTableRow.tableName)).flatMap { result =>
+            if (result.isEmpty) {
+              db.run(table.schema.create)
+            } else {
+              Future.successful(())
+            }
+          }
+        }
+      )
+    }
+
+    Await.result(createTableIfNotExists(users, tips), Duration.Inf)*/
+
     // The query interface for the Users table
     val users: TableQuery[Users] = TableQuery[Users]
 
@@ -156,6 +171,11 @@ object HelloSlick extends App {
         c <- tips if c.amount > 1.0
         u <- c.user
       } yield (c.amount, u.username)
+
+      val tipsUser: Query[Rep[String], String, Seq] = for {
+        c <- tips
+        u <- c.user
+      } yield u.username
 
       println("Generated SQL for the join query:\n" + joinQuery.result.statements)
 

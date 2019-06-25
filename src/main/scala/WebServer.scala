@@ -8,16 +8,11 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import slick.basic.DatabaseConfig
 import spray.json.DefaultJsonProtocol._
-import utils.SQLiteHelpers
-import utils.FromMap.to
-import akka.stream.scaladsl._
 import models._
-import slick.jdbc.GetResult
-
-import scala.concurrent.Future
 import scala.io.StdIn
-import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.SQLiteDriver.api._
+
+import scala.util.{Failure, Success}
 
 object WebServer {
 
@@ -29,44 +24,36 @@ object WebServer {
 
   def main(args: Array[String]) {
 
+    val users = TableQuery[Users]
+    val tips = TableQuery[Tips]
 
-    /*val users = TableQuery[Users]
+    val tipsUsersQuery: Query[Rep[String], String, Seq] = for {
+      c <- tips
+      u <- c.user
+    } yield u.username
 
     val db = Database.forConfig("sqlite")
-    try {
-      val setup = DBIO.seq(
-        (users.schema).create
-      )
-      val setupFuture = db.run(setup)
-      println("Done")
-
-      val q1 = for(m <- users) yield m.username
-      db.stream(q1.result).foreach(println)
-      val insert = DBIO.seq(
-        users += (1, "Foo", 0, 0)
-      )
-      val insertFuture = db.run(insert)
-      insertFuture.onComplete( _ => db.stream(q1.result).foreach(println))
-    } finally db.close*/
-
-    /*val route: Route =
+    val route: Route =
       get {
-        pathPrefix("col") {
-          val req = SQLiteHelpers.request(url, "SELECT * FROM user", Seq("key"))
-          req match {
-            case Some(r) => val users = r.flatMap(v => to[User].from(v))
-              complete(users)
-            case None => complete("mauvaise table")
+        pathPrefix("users") {
+          onComplete(db.run(users.map(_.username).result)) {
+            case Success(value) => complete(value)
+            case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
           }
         }
-      }*/
-    /*
+        pathPrefix("tips/users") {
+          onComplete(db.run(tipsUsersQuery.result)) {
+            case Success(value) => complete(value)
+            case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+          }
+        }
+      }
+
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
     println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
     StdIn.readLine() // let it run until user presses return
     bindingFuture
       .flatMap(_.unbind()) // trigger unbinding from the port
       .onComplete(_ ⇒ system.terminate()) // and shutdown when done
-      */
   }
 }
