@@ -1,4 +1,4 @@
-package fr.esgi.streambot.utils
+package utils
 
 import java.sql.{Connection, DriverManager, ResultSet}
 

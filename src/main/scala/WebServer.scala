@@ -1,5 +1,3 @@
-package fr.esgi.streambot
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
@@ -12,12 +10,14 @@ import slick.basic.DatabaseConfig
 import spray.json.DefaultJsonProtocol._
 import utils.SQLiteHelpers
 import utils.FromMap.to
-import akka.stream.alpakka.slick.scaladsl._
 import akka.stream.scaladsl._
+import models._
 import slick.jdbc.GetResult
 
 import scala.concurrent.Future
 import scala.io.StdIn
+import scala.concurrent.ExecutionContext.Implicits.global
+import slick.driver.SQLiteDriver.api._
 
 object WebServer {
 
@@ -27,41 +27,29 @@ object WebServer {
   // needed for the future map/flatmap in the end and future in fetchItem and saveOrder
   implicit val executionContext = system.dispatcher
 
-  case class User(id: Int, username: String, isSub: Boolean, isBlacklist: Boolean)
-  case class Users(vec: Vector[User])
-
-  case class Tip(id: Int, userID: Int, amount: Int)
-  case class Tips(vec: Vector[Tip])
-
-  case class Key(key: Int)
-  case class Keys(vec: Vector[Key])
-
-  implicit val userFormat = jsonFormat4(User)
-  implicit val usersFormat = jsonFormat1(Users)
-
-  implicit val tipFormat = jsonFormat3(Tip)
-  implicit val tipsFormat = jsonFormat1(Tips)
-
-  implicit val keyFormat = jsonFormat1(Key)
-  implicit val keysFormat = jsonFormat1(Keys)
-
   def main(args: Array[String]) {
 
-    implicit val session = SlickSession.forConfig("slick-sqlite")
-    system.registerOnTermination(session.close())
 
-    // This import brings everything you need into scope
-    import session.profile.api._
+    /*val users = TableQuery[Users]
 
-    // Stream the results of a query
-    val done: Future[Done] =
-      Slick
-        .source(TableQuery[Users].result)
+    val db = Database.forConfig("sqlite")
+    try {
+      val setup = DBIO.seq(
+        (users.schema).create
+      )
+      val setupFuture = db.run(setup)
+      println("Done")
 
-        .runWith(Sink.ignore)
+      val q1 = for(m <- users) yield m.username
+      db.stream(q1.result).foreach(println)
+      val insert = DBIO.seq(
+        users += (1, "Foo", 0, 0)
+      )
+      val insertFuture = db.run(insert)
+      insertFuture.onComplete( _ => db.stream(q1.result).foreach(println))
+    } finally db.close*/
 
-    /*
-    val route: Route =
+    /*val route: Route =
       get {
         pathPrefix("col") {
           val req = SQLiteHelpers.request(url, "SELECT * FROM user", Seq("key"))
@@ -71,20 +59,7 @@ object WebServer {
             case None => complete("mauvaise table")
           }
         }
-        /*pathPrefix("sub") {
-          complete("sub")
-        }
-        pathPrefix("giveaway") {
-          complete("giveaway")
-        }
-        pathPrefix("blacklist") {
-          complete("blacklist")
-        }
-        pathPrefix("poll") {
-          complete("poll")
-        }*/
-      }
-      */
+      }*/
     /*
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
     println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")

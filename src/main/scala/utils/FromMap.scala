@@ -1,6 +1,7 @@
-package fr.esgi.streambot.utils
+package utils
 
-import shapeless._, labelled.{ FieldType, field }
+import shapeless._
+import shapeless.labelled.{FieldType, field}
 
 // DO NOT MODIFY
 
