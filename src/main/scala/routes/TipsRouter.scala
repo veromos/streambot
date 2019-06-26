@@ -26,11 +26,14 @@ object TipsRouter {
   val tipsTotal = tips.map(_.amount).sum
 
 
-  /* get list of users with tips amount
-  val tipsAmountByUsers = for {
+  // get list of users with tips amount
+  val tipsAmountByUsers = (for {
     t <- tips
     u <- t.user
-  } yield (u.username, t.amount).groupBy(t.userId)*/
+  } yield (u.username, t)).groupBy(_._1)
+    .map { case (username, t) =>
+    (username, t.map(_._2.amount).sum)
+  }
 
 
   // get tips amount by user Id
@@ -44,6 +47,12 @@ object TipsRouter {
     get {
       path("tips" / "users") {
         onComplete(db.run(tipsUser.distinct.result)) {
+          case Success(value) => complete(value)
+          case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+        }
+      } ~
+      path("tips" / "users" / "amount") {
+        onComplete(db.run(tipsAmountByUsers.result)) {
           case Success(value) => complete(value)
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
         }
