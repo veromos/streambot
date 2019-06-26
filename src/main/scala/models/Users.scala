@@ -9,7 +9,4 @@ case class Users(tag: Tag) extends Table[(Int, String, Int, Int)](tag, "users") 
   def isBlacklist = column[Int]("is_blacklist")
   // Every table needs a * projection with the same type as the table's type parameter
   def * = (id, username, isSub, isBlacklist)
-
-  val users = TableQuery[Users]
 }
-
