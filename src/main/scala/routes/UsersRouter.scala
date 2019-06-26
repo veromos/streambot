@@ -14,18 +14,27 @@ object UsersRouter {
   val users = TableQuery[Users]
   val subs = users.filter(_.isSub === 1)
 
+  def blacklistAction(userId: Rep[Int]) = users.filter(_.id === userId).map(_.isBlacklist).update(1)
+
   val route: Route =
     get {
-      pathPrefix("users") {
+      path("users") {
         onComplete(db.run(users.result)) {
           case Success(value) => complete(value)
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
         }
       } ~
-      pathPrefix("subs") {
+      path("subs") {
         onComplete(db.run(subs.result)) {
           case Success(value) => complete(value)
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+        }
+      } ~
+      path("users" / "blacklist" / IntNumber ) { id => {
+        onComplete(db.run(blacklistAction(id))) {
+            case Success(value) => complete(s"user have been blacklisted")
+            case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+          }
         }
       }
     }
