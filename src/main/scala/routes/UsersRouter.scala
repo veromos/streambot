@@ -12,11 +12,18 @@ object UsersRouter {
 
   val db = Database.forConfig("sqlite")
   val users = TableQuery[Users]
+  val subs = users.filter(_.isSub === 1)
 
   val route: Route =
     get {
       pathPrefix("users") {
         onComplete(db.run(users.result)) {
+          case Success(value) => complete(value)
+          case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+        }
+      } ~
+      pathPrefix("subs") {
+        onComplete(db.run(subs.result)) {
           case Success(value) => complete(value)
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
         }
