@@ -26,7 +26,7 @@ object TipsRouter {
   val tipsTotal = tips.map(_.amount).sum
 
 
-  // get list of users with tips amount
+  // get users with tips amount
   val tipsAmountByUsers = (for {
     t <- tips
     u <- t.user
@@ -45,10 +45,24 @@ object TipsRouter {
 
   val route: Route =
     get {
+      path("tips") {
+        onComplete(db.run(tips.result)) {
+          case Success(value) => complete(value)
+          case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+        }
+      } ~
       path("tips" / "users") {
         onComplete(db.run(tipsUser.distinct.result)) {
           case Success(value) => complete(value)
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+        }
+      } ~
+      path("tips" / "users" / "amount" / IntNumber ) {
+        id => {
+          onComplete(db.run(tipsAmountByUserIdCompiled(id).result)) {
+            case Success(value) => complete(s"${value.getOrElse(0)}")
+            case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+          }
         }
       } ~
       path("tips" / "users" / "amount") {
@@ -61,13 +75,6 @@ object TipsRouter {
         onComplete(db.run(tipsTotal.result)) {
           case Success(value) => complete(s"${value.getOrElse(0)}")
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
-        }
-      } ~
-      path("tips" / "user" / IntNumber ) { id => {
-            onComplete(db.run(tipsAmountByUserIdCompiled(id).result)) {
-            case Success(value) => complete(s"${value.getOrElse(0)}")
-            case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
-          }
         }
       }
     }

@@ -29,21 +29,35 @@ object HelloSlick extends App {
 
     Await.result(createTableIfNotExists(users, tips), Duration.Inf)*/
 
-    // The query interface for the Users table
-    val users: TableQuery[Users] = TableQuery[Users]
-
-    // the query interface for the Tips table
-    val tips: TableQuery[Tips] = TableQuery[Tips]
+    val users = TableQuery[Users]
+    val tips = TableQuery[Tips]
+    val surveys = TableQuery[Surveys]
+    val surveyDetails = TableQuery[SurveyDetails]
+    val giveaways = TableQuery[Giveaways]
+    val giveawayDetails = TableQuery[GiveawayDetails]
 
     val setupAction: DBIO[Unit] = DBIO.seq(
       // Create the schema by combining the DDLs for the Users and Tips
       // tables using the query interfaces
-      (users.schema ++ tips.schema).create,
+      (users.schema
+        ++ tips.schema
+        ++ surveys.schema
+        ++ surveyDetails.schema
+        ++ giveaways.schema
+        ++ giveawayDetails.schema
+        ).create,
 
       // Insert some users
       users += (1, "Chris", 0, 0),
       users += (2, "Alex", 1, 0),
-      users += (3, "Iliasse", 0, 1)
+      users += (3, "Iliasse", 0, 1),
+      giveaways += (1, "My first giveaway!", 0),
+      giveaways += (2, "My second giveaway!", 0),
+      giveawayDetails += (1, 1, 1),
+      giveawayDetails += (2, 2, 2),
+      surveys += (0, "What is the best language ever ?", "Scala", "Java"),
+      surveyDetails += (0, 1, 1, 1),
+      surveyDetails += (0, 1, 2, 2)
     )
 
     val setupFuture: Future[Unit] = db.run(setupAction)

@@ -24,7 +24,7 @@ object UsersRouter {
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
         }
       } ~
-      path("subs") {
+      path("users" / "subs") {
         onComplete(db.run(subs.result)) {
           case Success(value) => complete(value)
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
@@ -32,7 +32,7 @@ object UsersRouter {
       } ~
       path("users" / "blacklist" / IntNumber ) { id => {
         onComplete(db.run(blacklistAction(id))) {
-            case Success(value) => complete(s"user have been blacklisted")
+            case Success(value) => complete(s"user is blacklist")
             case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
           }
         }
