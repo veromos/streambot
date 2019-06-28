@@ -7,6 +7,9 @@ import spray.json.DefaultJsonProtocol._
 import models._
 import slick.driver.SQLiteDriver.api._
 import scala.util.{Failure, Success}
+import spray.json._
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
 
 object UsersRouter {
 
@@ -15,6 +18,12 @@ object UsersRouter {
   val subs = users.filter(_.isSub === 1)
 
   def blacklistAction(userId: Rep[Int]) = users.filter(_.id === userId).map(_.isBlacklist).update(1)
+
+  def createUser(id: Int, username: String, isSub: Int, isBlacklist: Int) = {
+    Await.result(db.run(users returning users.map(_.id) += (0, username, 0, 0)), Duration.Inf)
+
+    //db.run(users returning users.map(_.id) += (0, username, 0, 0))
+  }
 
   val route: Route =
     get {
@@ -36,6 +45,11 @@ object UsersRouter {
             case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
           }
         }
+      }
+    } ~
+    post {
+      entity(as[User]) { user =>
+        complete(createUser(0, user.username, 0, 0).toJson)
       }
     }
 }

@@ -11,3 +11,8 @@ case class Tips(tag: Tag) extends Table[(Int, Double, Int)](tag, "tips") {
   // A reified foreign key relation that can be navigated to create a join
   def user = foreignKey("user_fk", userId, TableQuery[Users])(_.id)
 }
+
+case class Tip(
+  id: Int,
+  amount: Double,
+  userId: Int)
