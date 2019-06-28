@@ -29,19 +29,19 @@ object UsersRouter extends JsonSupport {
     get {
       path("users") {
         onComplete(db.run(users.result)) {
-          case Success(value) => complete(value)
+          case Success(value) => complete(value.map(e => (User.apply _) tupled e))
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
         }
       } ~
       path("users" / "subs") {
         onComplete(db.run(subs.result)) {
-          case Success(value) => complete(value)
+          case Success(value) => complete(value.map(e => (User.apply _) tupled e))
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
         }
       } ~
       path("users" / "blacklist" / IntNumber ) { id => {
         onComplete(db.run(blacklistAction(id))) {
-            case Success(value) => complete(s"user is blacklist")
+            case Success(value) => complete("{\"id\": " + id + ", \"response\": \"user is blacklisted\"}")
             case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
           }
         }
