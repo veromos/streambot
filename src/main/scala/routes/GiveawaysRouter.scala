@@ -2,12 +2,15 @@ package routes
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import spray.json.DefaultJsonProtocol._
 import models._
 import slick.driver.SQLiteDriver.api._
 import spray.json._
+import services.HttpService._
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 object GiveawaysRouter extends JsonSupport {
@@ -17,6 +20,12 @@ object GiveawaysRouter extends JsonSupport {
   val giveawayDetails = TableQuery[GiveawayDetails]
   val tips = TableQuery[Tips]
   val users = TableQuery[Users]
+
+  def createGiveaway(name: String) = {
+    val addGa = giveaways returning giveaways.map(_.id) += (0, name, 0)
+    val composedAction = addGa.flatMap { id => giveaways.filter(_.id === id).result.headOption }
+    db.run(composedAction)
+  }
 
   def giveawayPickWinner(giveawayId: Int) = {
     val randomFunction = SimpleFunction.nullary[Double]("random")
@@ -33,7 +42,6 @@ object GiveawaysRouter extends JsonSupport {
       .sortBy(_ => randomFunction)
       .take(1)
       .result
-    /*.filter(_._1.id === giveawayId)*/
   }
 
 
@@ -57,6 +65,13 @@ object GiveawaysRouter extends JsonSupport {
         onComplete(db.run(giveawayPickWinner(id))) {
           case Success(value) => complete(s"$value")
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
+        }
+      }
+    } ~
+    post {
+      path("giveaways") {
+        entity(as[Giveaway]) { g =>
+          complete(Created, createGiveaway(g.name).map(e => (Giveaway.apply _) tupled e.get))
         }
       }
     }

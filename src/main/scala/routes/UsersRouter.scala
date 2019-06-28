@@ -4,9 +4,8 @@ import models._
 import services.HttpService._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import slick.driver.SQLiteDriver.api._
 import akka.http.scaladsl.model.StatusCodes._
-
+import slick.driver.SQLiteDriver.api._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
@@ -47,8 +46,10 @@ object UsersRouter extends JsonSupport {
       }
     } ~
     post {
-      entity(as[User]) { user =>
-        complete(Created, createUser(0, user.username, 0, 0).map(e => (User.apply _) tupled e.get))
+      path("users") {
+        entity(as[User]) { user =>
+          complete(Created, createUser(0, user.username, 0, 0).map(e => (User.apply _) tupled e.get))
+        }
       }
     }
 }
