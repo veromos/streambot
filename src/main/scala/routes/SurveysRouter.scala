@@ -7,8 +7,9 @@ import spray.json.DefaultJsonProtocol._
 import models._
 import scala.util.{Failure, Success}
 import slick.jdbc.SQLiteProfile.api._
+import spray.json._
 
-object SurveysRouter {
+object SurveysRouter extends JsonSupport {
 
   val db = Database.forConfig("sqlite")
   val surveys = TableQuery[Surveys]

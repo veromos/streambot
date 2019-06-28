@@ -6,10 +6,11 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import spray.json.DefaultJsonProtocol._
 import models._
 import slick.driver.SQLiteDriver.api._
+import spray.json._
 
 import scala.util.{Failure, Success}
 
-object GiveawaysRouter {
+object GiveawaysRouter extends JsonSupport {
 
   val db = Database.forConfig("sqlite")
   val giveaways = TableQuery[Giveaways]

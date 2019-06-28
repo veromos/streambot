@@ -7,13 +7,15 @@ import spray.json.DefaultJsonProtocol._
 import models._
 import slick.driver.SQLiteDriver.api._
 import scala.util.{Failure, Success}
+import spray.json._
 
-object TipsRouter {
+object TipsRouter extends JsonSupport {
 
   val db = Database.forConfig("sqlite")
   val tips = TableQuery[Tips]
   val users = TableQuery[Users]
 
+  def createTip(amount: Double, userId: Int) = db.run(tips += (0, amount, userId))
 
   // get list of user who give tips
   val tipsUser: Query[Rep[String], String, Seq] = for {
@@ -76,6 +78,11 @@ object TipsRouter {
           case Success(value) => complete(s"${value.getOrElse(0)}")
           case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
         }
-      }
+      }/* ~
+      post {
+        entity(as[Tip]) { tip =>
+          complete(createTip(tip.amount, tip.userId).toJson)
+        }
+      }*/
     }
 }
