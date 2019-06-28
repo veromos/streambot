@@ -8,7 +8,7 @@ import slick.jdbc.SQLiteProfile.api._
 import slick.jdbc.meta.MTable
 
 // The main application
-object HelloSlick extends App {
+object PopulateDatabase extends App {
 
   val db = Database.forConfig("sqlite")
 
