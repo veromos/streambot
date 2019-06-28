@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.server.Directives._
+import models.JsonSupport
 import routes.{GiveawaysRouter, SurveysRouter, TipsRouter, UsersRouter}
 
 import scala.io.StdIn
@@ -12,7 +13,7 @@ object MainRouter {
   val routes = TipsRouter.route ~ UsersRouter.route ~ GiveawaysRouter.route ~ SurveysRouter.route
 }
 
-object HttpService extends App {
+object HttpService extends App with JsonSupport {
   // needed to run the route
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()

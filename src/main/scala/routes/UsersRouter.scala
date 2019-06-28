@@ -11,7 +11,7 @@ import spray.json._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
-object UsersRouter {
+object UsersRouter extends JsonSupport {
 
   val db = Database.forConfig("sqlite")
   val users = TableQuery[Users]
