@@ -20,3 +20,7 @@ case class SurveyDetails(tag: Tag) extends Table[(Int, Int, Int, Int)](tag, "sur
   def survey = foreignKey("survey_fk", surveyId, TableQuery[Surveys])(_.id)
   def user = foreignKey("user_fk", userId, TableQuery[Users])(_.id)
 }
+
+case class Survey(id: Int, question: String, answer_1: String, answer_2: String)
+
+case class SurveyDetail(id: Int, surveyId: Int, userId: Int, answerId: Int)
