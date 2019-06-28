@@ -10,4 +10,6 @@ trait JsonSupport extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val tipFormat = jsonFormat3(Tip.apply)
   implicit val surveyFormat = jsonFormat4(Survey.apply)
   implicit val giveawayFormat = jsonFormat3(Giveaway.apply)
+  implicit val giveDetailFormat = jsonFormat3(GiveDetail.apply)
+  implicit val FullClassFormat = jsonFormat4(FullClass.apply)
 }
