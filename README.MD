@@ -24,8 +24,3 @@ sbt runMain services.HttpService
 ```
 
 Now you can start requesting the api at http://localhost:8080
-
-
-### Running the tests
-
-In coming
