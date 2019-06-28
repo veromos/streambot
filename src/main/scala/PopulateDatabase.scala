@@ -57,7 +57,8 @@ object PopulateDatabase extends App {
       giveawayDetails += (2, 2, 2),
       surveys += (0, "What is the best language ever ?", "Scala", "Java"),
       surveyDetails += (0, 1, 1, 1),
-      surveyDetails += (0, 1, 2, 2)
+      surveyDetails += (0, 1, 2, 2),
+      surveyDetails += (0, 1, 3, 1)
     )
 
     val setupFuture: Future[Unit] = db.run(setupAction)
@@ -114,23 +115,6 @@ object PopulateDatabase extends App {
 
       // Execute the query and print the Seq of results
       db.run(filterQuery.result.map(println))
-
-    }.flatMap { _ =>
-
-      /* Update */
-
-      // Construct an update query with the sales column is_blacklist the one to update
-      val updateQuery: Query[Rep[Int], Int, Seq] = users.map(_.isBlacklist)
-
-      val updateAction: DBIO[Int] = updateQuery.update(1)
-
-      // Print the SQL for the Users update query
-      println("Generated SQL for Coffees update:\n" + updateQuery.updateStatement)
-
-      // Perform the update
-      db.run(updateAction.map { numUpdatedRows =>
-        println(s"Updated $numUpdatedRows rows")
-      })
 
     }.flatMap { _ =>
 
