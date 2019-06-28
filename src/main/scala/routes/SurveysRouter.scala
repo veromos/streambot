@@ -8,6 +8,7 @@ import models._
 import scala.util.{Failure, Success}
 import slick.jdbc.SQLiteProfile.api._
 import spray.json._
+import services.HttpService._
 
 object SurveysRouter extends JsonSupport {
 
