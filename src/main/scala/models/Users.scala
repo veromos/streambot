@@ -12,11 +12,23 @@ final case class Users(tag: Tag) extends Table[(Int, String, Int, Int)](tag, "us
 }
 
 case class User(
-  id: Int,
-  username: String,
-  isSub: Int,
-  isBlacklist: Int)
+                 id: Int,
+                 username: String,
+                 isSub: Int,
+                 isBlacklist: Int)
+
+case class UserTips(
+                 id: Int,
+                 username: String,
+                 isSub: Int,
+                 isBlacklist: Int,
+                 Tips: Double)
 
 object User {
   val users: TableQuery[Users] = TableQuery[Users]
+}
+
+object UserTips {
+  val users: TableQuery[Users] = TableQuery[Users]
+  val tips: TableQuery[Tips] = TableQuery[Tips]
 }

@@ -16,3 +16,7 @@ case class Tip(
   id: Int,
   amount: Double,
   userId: Int)
+
+object Tip {
+  val tips: TableQuery[Tips] = TableQuery[Tips]
+}
