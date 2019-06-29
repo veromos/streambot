@@ -17,11 +17,12 @@ object TipsRouter extends JsonSupport {
   val users = TableQuery[Users]
 
   def createTip(amount: Double, userId: Int) = {
-
     val addTip = tips returning tips.map(_.id) += (0, amount, userId)
     val composedAction = addTip.flatMap { id => tips.filter(_.id === id).result.headOption }
     db.run(composedAction)
   }
+
+  def removeTip(tipId: Int) = db.run(tips.filter(_.id === tipId).delete)
 
   // get list of user who give tips
   val tipsUser = for {
@@ -88,6 +89,14 @@ object TipsRouter extends JsonSupport {
       path("tips") {
         entity(as[Tip]) { tip =>
           complete(Created, createTip(tip.amount, tip.userId).map(e => (Tip.apply _) tupled e.get))
+        }
+      }
+    } ~
+    delete {
+      path("tips" / IntNumber) { id =>
+        onComplete(removeTip(id)) {
+          case Success(value) => complete(NoContent)
+          case Failure(ex) => complete((500, s"An error occured: ${ex.getMessage}"))
         }
       }
     }
