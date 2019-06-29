@@ -2,7 +2,7 @@ package models
 
 import slick.driver.SQLiteDriver.api._
 
-case class Tips(tag: Tag) extends Table[(Int, Double, Int)](tag, "tips") {
+  case class Tips(tag: Tag) extends Table[(Int, Double, Int)](tag, "tips") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def amount = column[Double]("amount")
   def userId = column[Int]("user_id")
@@ -10,4 +10,13 @@ case class Tips(tag: Tag) extends Table[(Int, Double, Int)](tag, "tips") {
 
   // A reified foreign key relation that can be navigated to create a join
   def user = foreignKey("user_fk", userId, TableQuery[Users])(_.id)
+}
+
+case class Tip(
+  id: Int,
+  amount: Double,
+  userId: Int)
+
+object Tip {
+  val tips: TableQuery[Tips] = TableQuery[Tips]
 }

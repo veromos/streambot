@@ -18,3 +18,9 @@ case class GiveawayDetails(tag: Tag) extends Table[(Int, Int, Int)](tag, "giveaw
   def giveaway = foreignKey("giveaway_fk", giveawayId, TableQuery[Giveaways])(_.id)
   def user = foreignKey("user_fk", userId, TableQuery[Users])(_.id)
 }
+
+case class Giveaway(id: Int, name: String, winnerId: Int)
+
+case class GiveDetail(id: Int, giveawayId: Int, userId: Int)
+
+case class FullClass(giveaway: Giveaway, giveawayDetail: GiveDetail, tips: Tip, user: User)
